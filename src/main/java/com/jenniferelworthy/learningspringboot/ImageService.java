@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -37,15 +38,17 @@ public class ImageService {
 	private final CounterService counterService;
 	private final GaugeService gaugeService;
 	private final InMemoryMetricRepository inMemoryMetricRepository;
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Autowired
-	public ImageService(ImageRepository repository, ResourceLoader resourceLoader, CounterService counterService, GaugeService gaugeService, InMemoryMetricRepository inMemoryMetricRepository) {
+	public ImageService(ImageRepository repository, ResourceLoader resourceLoader, CounterService counterService, GaugeService gaugeService, InMemoryMetricRepository inMemoryMetricRepository, SimpMessagingTemplate messaginTemplate) {
 
 		this.repository = repository;
 		this.resourceLoader = resourceLoader;
 		this.counterService = counterService;
 		this.gaugeService = gaugeService;
 		this.inMemoryMetricRepository = inMemoryMetricRepository;
+		this.messagingTemplate = messaginTemplate;
 		
 		this.counterService.reset("files.uploaded");
 		this.gaugeService.submit("files.uploaded.lastBytes", 0);
@@ -68,6 +71,7 @@ public class ImageService {
 			counterService.increment("files.uploaded");
 			gaugeService.submit("files.uploaded.lastBytes", file.getSize());
 			inMemoryMetricRepository.increment(new Delta<Number>("files.uploaded.totalBytes", file.getSize()));
+			messagingTemplate.convertAndSend("/topic/newImage", file.getOriginalFilename());
 		}
 	}
 
@@ -76,6 +80,7 @@ public class ImageService {
 		final Image byName = repository.findByName(filename);
 		repository.delete(byName);
 		Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+		messagingTemplate.convertAndSend("/topic/deleteImage", filename);
 	}
 
 	/**

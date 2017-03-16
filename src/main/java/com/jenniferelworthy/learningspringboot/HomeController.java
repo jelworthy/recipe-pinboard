@@ -71,7 +71,7 @@ public class HomeController {
 							 RedirectAttributes redirectAttributes) {
 		try {
 			imageService.createImage(file);
-			redirectAttributes.addFlashAttribute("flash.message", "Successfully uploaded " + file.getName());
+			redirectAttributes.addFlashAttribute("flash.message", "Brilliant it is uploaded " + file.getName());
 		} catch (IOException e) {
 			redirectAttributes.addFlashAttribute("flash.message", "Failed to upload " + file.getName() + " => " + e.getMessage());
 		}
