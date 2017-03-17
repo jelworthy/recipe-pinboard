@@ -3,6 +3,7 @@ package com.jenniferelworthy.learningspringboot;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Image {
@@ -12,10 +13,14 @@ public class Image {
 	
 	private String name;
 	
+	@OneToOne
+	private User owner;
+
 	private Image() {}
 	
-	public Image (String name) {
+	public Image (String name, User owner) {
 		this.name = name;
+		this.owner = owner;
 	}
 
 	public Long getId() {
@@ -32,6 +37,14 @@ public class Image {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public User getOwner() {
+		return owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	
