@@ -1,9 +1,9 @@
 package com.jenniferelworthy.learningspringboot;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
+/*import org.springframework.boot.actuate.endpoint.MetricReaderPublicMetrics;
 import org.springframework.boot.actuate.endpoint.PublicMetrics;
-import org.springframework.boot.actuate.metrics.repository.InMemoryMetricRepository;
+import org.springframework.boot.actuate.metrics.repository.InMemoryMetricRepository;*/
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -14,7 +14,7 @@ public class LearningSpringBootVideoApplication {
 		SpringApplication.run(LearningSpringBootVideoApplication.class, args);
 	}
 	
-	@Bean
+	/*@Bean
 	InMemoryMetricRepository inMemoryMetricRepository() {
 		return new InMemoryMetricRepository();
 	}
@@ -22,5 +22,5 @@ public class LearningSpringBootVideoApplication {
 	@Bean
 	PublicMetrics publicMetrics(InMemoryMetricRepository repository) {
 		return new MetricReaderPublicMetrics(repository);
-	}
+	}*/
 }

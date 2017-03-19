@@ -2,6 +2,9 @@ package com.jenniferelworthy.learningspringboot;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -9,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +29,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class HomeController {
 
+	private static final Logger log = LoggerFactory.getLogger(HomeController.class);
+
 	private static final String BASE_PATH = "/images";
 	private static final String FILENAME = "{filename:.+}";
 
@@ -37,7 +43,7 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "/")
-	public String index(Model model, Pageable pageable) throws IOException {
+	public String index(Model model, Pageable pageable, @AuthenticationPrincipal Object auth) throws IOException {
 		final Page<Image> page = imageService.findPage(pageable);
 		model.addAttribute("page", page);
 		if (page.hasPrevious()) {
@@ -51,7 +57,8 @@ public class HomeController {
 
 	@RequestMapping(method = RequestMethod.GET, value = BASE_PATH + "/" + FILENAME + "/raw")
 	@ResponseBody
-	public ResponseEntity<?> oneRawImage(@PathVariable String filename) {
+	public ResponseEntity<?> oneRawImage(@PathVariable String filename,
+										 @AuthenticationPrincipal Object auth) {
 
 		try {
 			Resource file = imageService.findOneImage(filename);
@@ -68,19 +75,21 @@ public class HomeController {
 
 	@RequestMapping(method = RequestMethod.POST, value = BASE_PATH)
 	public String createFile(@RequestParam("file") MultipartFile file,
-							 RedirectAttributes redirectAttributes) {
+							 RedirectAttributes redirectAttributes,
+							 @AuthenticationPrincipal Object auth) {
 		try {
 			imageService.createImage(file);
-			redirectAttributes.addFlashAttribute("flash.message", "Brilliant it is uploaded " + file.getName());
+			redirectAttributes.addFlashAttribute("flash.message", "Successfully uploaded " + file.getOriginalFilename());
 		} catch (IOException e) {
-			redirectAttributes.addFlashAttribute("flash.message", "Failed to upload " + file.getName() + " => " + e.getMessage());
+			redirectAttributes.addFlashAttribute("flash.message", "Failed to upload " + file.getOriginalFilename() + " => " + e.getMessage());
 		}
 		return "redirect:/";
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = BASE_PATH + "/" + FILENAME)
 	public String deleteFile(@PathVariable String filename,
-							 RedirectAttributes redirectAttributes) {
+							 RedirectAttributes redirectAttributes,
+							 @AuthenticationPrincipal Object auth) {
 		try {
 			imageService.deleteImage(filename);
 			redirectAttributes.addFlashAttribute("flash.message", "Successfully deleted " + filename);

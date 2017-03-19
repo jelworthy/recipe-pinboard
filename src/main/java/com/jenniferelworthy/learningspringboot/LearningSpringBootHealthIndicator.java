@@ -1,4 +1,4 @@
-package com.jenniferelworthy.learningspringboot;
+/*package com.jenniferelworthy.learningspringboot;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -27,4 +27,4 @@ public class LearningSpringBootHealthIndicator implements HealthIndicator {
 		}
 	}
 
-}
+}*/
